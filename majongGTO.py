@@ -133,7 +133,7 @@ def get_cant_be_pair(who_is_trip, xx, bnx, count, showtile):
                 for i in range(5):
                     print(mlist[xx[i]], end=' ')
                 print(mlist[pair] + mlist[pair])
-                time.sleep(1)
+                #time.sleep(1)
             count += 1
         pair += 1
 
@@ -172,112 +172,22 @@ xx=[1, 0, 0, 0, 0]
 count=0
 #count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
 print(count)
-#第一組是刻 1830316
-who_is_trip=[1]
-bnx=[0, w8, w8, w8, w8]
-xxend=[p7, p7, p7, p7, p7]
-xapart=[0, 0, 0, 0]
-xxchange=[1, 1, 1, 1, 1]
-xx=[1, 0, 0, 0, 0]
-count=0
-#count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
-print(count)
-#第二組是刻
-who_is_trip=[2]
-bnx=[w8, 0, w8, w8, w8]
-xxend=[p7, p7, p7, p7, p7]
-xapart=[0, 0, 0, 0]
-xxchange=[1, 1, 1, 1, 1]
-xx=[1, 0, 0, 0, 0]
-count=0
-count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
-print(count)
-'''
-print("全部不重複")
-count += countallcomb(w8, w8, w8, w8, w8, s4, s7, p1, p4, p7, 3, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
-print(count)
+def one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile): #58922754
+    who_is_trip=[0]
+    for i in range(5):
+        bnx=[w8, w8, w8, w8, w8]
+        xxend=[p4, p7, p7, p7, p7]
+        xapart=[0, 0, 0, 0]
+        xxchange=[1, 1, 1, 1, 1]
+        xx=[1, 0, 0, 0, 0]
+        who_is_trip[0]=[i+1]
+        bnx[i]=0
+        xxend=[p7, p7, p7, p7, p7]
+        if i == 4: xxend[i] = 白
+        if i >= 1: xapart[i-1]=1
+        count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+        print("i=", i)
+        time.sleep(1)
+    print(count)
+one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
 
-count = 0
-print("1張重疊*眼")
-print("一二組重疊")
-count += countallcomb(w6, w8, w8, w8, w8, s5, s7, p1, p4, p7, 2, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False)
-print("二三組重疊")
-count += countallcomb(w8, w6, w8, w8, w8, s2, s5, s7, p4, p7, 3, 2, 3, 3, 1, 1, 0, 1, 1, count, showtile=False)
-print("三四組重疊")
-count += countallcomb(w8, w8, w6, w8, w8, s4, s7, p2, p4, p7, 3, 3, 2, 3, 1, 1, 1, 0, 1, count, showtile=False)
-print("四五組重疊")
-count += countallcomb(w8, w8, w8, w6, w8, s4, s7, p2, p5, p7, 3, 3, 3, 2, 1, 1, 1, 1, 0, count, showtile=False)
-print(count)
-
-count = 0
-print("2張重疊*眼")
-#一二三組各疊一張
-count += countallcomb(w4, w6, w8, w8, w8, s3, s5, s7, p4, p7, 2, 2, 3, 3, 1, 0, 0, 1, 1, count, showtile=False)
-#二三四組各疊一張
-count += countallcomb(w8, w4, w6, w8, w8, w7, s3, s5, s7, p7, 3, 2, 2, 3, 1, 1, 0, 0, 1, count, showtile=False)
-#三四五組各疊一張
-count += countallcomb(w8, w8, w4, w6, w8, s4, s7, p3, p5, p7, 3, 3, 2, 2, 1, 1, 1, 0, 0, count, showtile=False)
-#一二組疊兩張
-count += countallcomb(w7, w8, w8, w8, w8, s6, s7, p1, p4, p7, 1, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False)
-#二三組疊兩張
-count += countallcomb(w8, w7, w8, w8, w8, s3, s6, s7, p4, p7, 3, 1, 3, 3, 1, 1, 0, 1, 1, count, showtile=False)
-#三四組疊兩張
-count += countallcomb(w8, w8, w7, w8, w8, s4, s7, p3, p4, p7, 3, 3, 1, 3, 1, 1, 1, 0, 1, count, showtile=False)
-#四五組重疊兩張
-count += countallcomb(w8, w8, w8, w7, w8, s4, s7, p3, p6, p7, 3, 3, 3, 1, 1, 1, 1, 1, 0, count, showtile=False)
-print(count)
-
-count=0
-print("3張重疊*眼")
-#一組是刻
-count += countallcomb(0, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
-#二組是刻
-count += countallcomb(w8, 0, w8, w8, w8, s7, p1, p1, p4, p7, 2, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
-#三組是刻
-count += countallcomb(w8, w8, 0, w8, w8, s7, p1, p4, p4, p7, 3, 2, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
-#四組是刻
-count += countallcomb(w8, w8, w8, 0, w8, s7, p1, p4, p7, p7, 3, 3, 2, 3, 1, 1, 1, 1, 1, count, showtile=False)
-#五組是刻
-count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 2, 1, 1, 1, 1, 1, count, showtile=False)
-#一二組重疊三張
-print(countallcomb(w8, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False))
-#一二組是刻
-loop(0, 0, 8w, 8w, 8w, s9, p1, p1, p4, p7, 1, 0, 3, 3, 1, 0, 1, 1, 1)
-'''
-def get_all_xapart_xxchange():
-    xapart=[0, 0, 0, 0]
-    all_xapart=[]
-    for x1apart in range(4):
-        xapart[0] = x1apart
-        for x2apart in range(4):
-            xapart[1] = x2apart
-            for x3apart in range(4):
-                xapart[2] = x3apart
-                for x4apart in range(4):
-                    xapart[3] = x4apart
-                    all_xapart.append(xapart)
-    xxchange = [0, 0, 0, 0, 0]
-    all_xxchange=[]
-    count=0
-    for x1change in range(2):
-        xxchange[0] = x1change
-        for x2change in range(2):
-            xxchange[1] = x2change
-            for x3change in range(2):
-                xxchange[2] = x3change
-                for x4change in range(2):
-                    xxchange[3] = x4change
-                    for x5change in range(2):
-                        xxchange[4] = x5change
-                        all_xxchange.append(xxchange)
-                        count+=1
-    return all_xapart, all_xxchange
-
-def trans_xapart_to_bnx_xxend(get_all_xapart_xxchange, xxend):
-    all_xapart = get_all_xapart_xxchange[0]
-    all_xxchange = get_all_xapart_xxchange[1]
-    for xapart in all_xapart:
-        if xapart[3] == 0: xxend[4] = 白
-        else: xxend[4] = p7
-    
-#print(get_all_xapart_xxchange())
