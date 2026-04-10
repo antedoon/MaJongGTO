@@ -7,16 +7,26 @@
 =一二組重疊 + 二三組重疊 +...+ 四五組重疊
 =
 
+全部胡牌可能
+=全順 + 1刻4順 +...+ 全刻
+=全順 + 第1組刻 2345順 + 第1組順 2刻 345順 +...+ 全刻
+=
+
 0409
 目前版本:優化get_pair(), countallcomb(), 以get_cant_be_pair(), loop()取代 
 get_cant_be_pair(), loop()已可包含所有胡牌可能 帶入參數改為使用list
 4010
 嘗試將參數自動化輸入，目前發現可能規律，用xapart跟xxchange窮舉即可，bnx跟xxend可以用xapart去反推
 新增all_xapart_xxchange()函式
+
+嘗試後發現規律不對且複雜 改試 全順 + 1刻4順 +...+ 全刻
+新增函式illegal_comb()，將不合法組合都去除
+    
 todo: 
     1.把全部胡牌可能的參數一個一個帶入 or 寫一個函式盡量可涵蓋全部胡牌可能 直接帶入loop即可
     2.製作胡牌種期望值
 """
+import time
 w1=1
 w2=2
 w3=3
@@ -71,13 +81,32 @@ def check(x, bn):
     while x in banned_number: x+=1
     return x
 
-def get_cant_be_pair(xx, bnx, count, showtile):
+def illegal_comb(xx, who_is_trip):
+    '''
+    跳過不合法組合
+    輸入: 目前組合, 誰是刻子
+    輸出: 合不合法
+    '''
+    hand=[]
+    
+    for i in range(5):
+        if i+1 not in who_is_trip:
+            for seq in range(3): hand.append(xx[i]+seq)
+        else:
+            for l in range(3): hand.append(xx[i])
+    hand_set = list(set(hand))
+    for i in hand_set:
+        if hand.count(i) >= 5: return True
+    return False
+
+def get_cant_be_pair(who_is_trip, xx, bnx, count, showtile):
     '''
     那些牌不能當眼
     
     輸入: 刻子的位置
     輸出: 更新後的 count
     '''
+    if illegal_comb(xx, who_is_trip): return count
     cant_be_pair = []
     for i in range(5): #111
         if bnx[i] == 0:  cant_be_pair.append(xx[i])
@@ -97,7 +126,6 @@ def get_cant_be_pair(xx, bnx, count, showtile):
     cant_be_pair = list(set(cant_be_pair))
     cant_be_pair.sort()
     if cant_be_pair == []: cant_be_pair.append(0)
-
     pair = 1
     while pair <= 34:
         if pair not in cant_be_pair:
@@ -105,31 +133,65 @@ def get_cant_be_pair(xx, bnx, count, showtile):
                 for i in range(5):
                     print(mlist[xx[i]], end=' ')
                 print(mlist[pair] + mlist[pair])
+                time.sleep(1)
             count += 1
         pair += 1
 
     return count
 
-def loop(i, xx, bnx, xxend, xapart, xxchange, count, showtile):
+def loop(i, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
+    '''
+    主窮舉迴圈
+    輸入:
+        who_is_trip=誰是刻子
+        bnx=順子不可出現的最小數字
+        xxend=窮舉最後一組數字
+        xapart=x2-x1
+        xxchange=xx[i]每次迴圈動多少(分組)同組必有重疊, 從1到下個1之間都同組
+        xx=第幾組
+    輸出:
+        int count
+    '''
     while xx[i] <= xxend[i]:
         xx[i] = check(xx[i], bnx[i])
-        if i == 4: count = get_cant_be_pair(xx, bnx, count, showtile)
+        if i == 4: count = get_cant_be_pair(who_is_trip, xx, bnx, count, showtile)
         else:
             xx[i + 1] = xx[i] + xapart[i]
-            count = loop(i + 1, xx, bnx, xxend, xapart, xxchange, count, showtile)
+            count = loop(i + 1, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile)
         xx[i] += xxchange[i]
         if xxchange[i] == 0: break
     return count
 
+#全順 1762320
+who_is_trip=[]
 bnx=[w8, w8, w8, w8, w8]
-xxend=[s4, s7, p1, p4, p7]
-xapart=[3, 3, 3, 3]
+xxend=[p4, p7, p7, p7, p7]
+xapart=[0, 0, 0, 0]
 xxchange=[1, 1, 1, 1, 1]
 xx=[1, 0, 0, 0, 0]
 count=0
-
-#count = loop(0, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
-#print(count)
+#count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
+print(count)
+#第一組是刻 1830316
+who_is_trip=[1]
+bnx=[0, w8, w8, w8, w8]
+xxend=[p7, p7, p7, p7, p7]
+xapart=[0, 0, 0, 0]
+xxchange=[1, 1, 1, 1, 1]
+xx=[1, 0, 0, 0, 0]
+count=0
+#count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
+print(count)
+#第二組是刻
+who_is_trip=[2]
+bnx=[w8, 0, w8, w8, w8]
+xxend=[p7, p7, p7, p7, p7]
+xapart=[0, 0, 0, 0]
+xxchange=[1, 1, 1, 1, 1]
+xx=[1, 0, 0, 0, 0]
+count=0
+count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
+print(count)
 '''
 print("全部不重複")
 count += countallcomb(w8, w8, w8, w8, w8, s4, s7, p1, p4, p7, 3, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
@@ -170,15 +232,17 @@ print("3張重疊*眼")
 #一組是刻
 count += countallcomb(0, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
 #二組是刻
-count += countallcomb(w8, 0, w8, w8, w8, s7, p1, p1, p4, p7, 0, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+count += countallcomb(w8, 0, w8, w8, w8, s7, p1, p1, p4, p7, 2, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
 #三組是刻
-count += countallcomb(w8, w8, 0, w8, w8, s7, p1, p4, p4, p7, 3, 0, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+count += countallcomb(w8, w8, 0, w8, w8, s7, p1, p4, p4, p7, 3, 2, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
 #四組是刻
-count += countallcomb(w8, w8, w8, 0, w8, s7, p1, p4, p7, p7, 3, 3, 0, 3, 1, 1, 1, 1, 1, count, showtile=False)
+count += countallcomb(w8, w8, w8, 0, w8, s7, p1, p4, p7, p7, 3, 3, 2, 3, 1, 1, 1, 1, 1, count, showtile=False)
 #五組是刻
-count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 0, 1, 1, 1, 1, 1, count, showtile=False)
+count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 2, 1, 1, 1, 1, 1, count, showtile=False)
 #一二組重疊三張
 print(countallcomb(w8, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False))
+#一二組是刻
+loop(0, 0, 8w, 8w, 8w, s9, p1, p1, p4, p7, 1, 0, 3, 3, 1, 0, 1, 1, 1)
 '''
 def get_all_xapart_xxchange():
     xapart=[0, 0, 0, 0]
@@ -216,4 +280,4 @@ def trans_xapart_to_bnx_xxend(get_all_xapart_xxchange, xxend):
         if xapart[3] == 0: xxend[4] = 白
         else: xxend[4] = p7
     
-print(get_all_xapart_xxchange())
+#print(get_all_xapart_xxchange())
