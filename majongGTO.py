@@ -180,7 +180,7 @@ count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 0, 1, 1, 
 #一二組重疊三張
 print(countallcomb(w8, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False))
 '''
-def all_xapart_xxchange():
+def get_all_xapart_xxchange():
     xapart=[0, 0, 0, 0]
     all_xapart=[]
     for x1apart in range(4):
@@ -207,5 +207,13 @@ def all_xapart_xxchange():
                         xxchange[4] = x5change
                         all_xxchange.append(xxchange)
                         count+=1
-    print(len(all_xapart), len(all_xxchange))
-all_xapart_xxchange()
+    return all_xapart, all_xxchange
+
+def trans_xapart_to_bnx_xxend(get_all_xapart_xxchange, xxend):
+    all_xapart = get_all_xapart_xxchange[0]
+    all_xxchange = get_all_xapart_xxchange[1]
+    for xapart in all_xapart:
+        if xapart[3] == 0: xxend[4] = 白
+        else: xxend[4] = p7
+    
+print(get_all_xapart_xxchange())
