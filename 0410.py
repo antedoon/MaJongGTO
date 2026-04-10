@@ -1,0 +1,263 @@
+"""
+全部胡牌可能
+=全不重疊*眼 + 一張重疊*眼 + 兩張重疊*眼 + 三張重疊*眼 +...+十五張重疊
+=
+
+一張重疊
+=一二組重疊 + 二三組重疊 +...+ 四五組重疊
+=
+
+0409
+目前版本:優化get_pair(), countallcomb(), 以get_cant_be_pair(), loop()取代 
+get_cant_be_pair(), loop()已可包含所有胡牌可能 帶入參數改為使用list
+
+todo: 
+    1.把全部胡牌可能的參數一個一個帶入 or 寫一個函式盡量可涵蓋全部胡牌可能 直接帶入loop即可
+    2.製作版本管理
+    3.製作胡牌種期望值
+"""
+w1=1
+w2=2
+w3=3
+w4=4
+w5=5
+w6=6
+w7=7
+w8=8
+w9=9
+s1=10
+s2=11
+s3=12
+s4=13
+s5=14
+s6=15
+s7=16
+s8=17
+s9=18
+p1=19
+p2=20
+p3=21
+p4=22
+p5=23
+p6=24
+p7=25
+p8=26
+p9=27
+東=28
+南=29
+西=30
+北=31
+中=32
+發=33
+白=34
+mlist = ['null', 
+        '1w', '2w', '3w', '4w', '5w', '6w', '7w', '8w', '9w', '1s', 
+        '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '1p', '2p', 
+        '3p', '4p', '5p', '6p', '7p', '8p', '9p', '東', '南', '西', 
+        '北', '中', '發', '白']
+def check(x, bn):
+    '''
+    順子不可能出現那些起始數字
+    輸入: 不可出現的整數 0 <= x <= 9
+    輸出: 跳過不可出現數的數(進位)
+    
+    若是刻子輸入0
+    '''
+    banned_number=[]
+    if bn == 0: return x
+    for i in range(bn, 10): banned_number.append(i)
+    for i in range(bn+9, 10+9): banned_number.append(i)
+    while x in banned_number: x+=1
+    return x
+def get_pair(x1, x2, x3, x4, x5, bn1, bn2, bn3, bn4, bn5, count, showtile):
+    '''
+    那些牌不能當眼
+    
+    輸入: 刻子的位置
+    輸出: 刻子位置的list
+    
+    todo: 還有123, 234, 345 三個順子但也不能當眼的可能
+    '''
+    cant_be_pair = []
+    if bn1 == 0: cant_be_pair.append(x1)
+    if bn2 == 0: cant_be_pair.append(x2)
+    if bn3 == 0: cant_be_pair.append(x3)
+    if bn4 == 0: cant_be_pair.append(x4)
+    if bn5 == 0: cant_be_pair.append(x5)
+    cant_be_pair.sort()
+    if cant_be_pair == []: cant_be_pair.append(0)
+    
+    pair = 1
+    while pair <= 34:
+        for i in cant_be_pair:
+            if pair == i: 
+                can_be_pair = False
+                break
+            else: can_be_pair = True
+        if can_be_pair == True: 
+            if showtile: print(mlist[x1], mlist[x2], mlist[x3], mlist[x4], mlist[x5], mlist[pair]+mlist[pair])
+            count += 1
+        pair += 1
+    
+    return count
+
+def countallcomb(bn1, bn2, bn3, bn4, bn5, x1end, x2end, x3end, x4end, x5end, x1_x2, x2_x3, x3_x4, x4_x5, x1ch, x2ch, x3ch, x4ch, x5ch, count, showtile):
+    '''
+    窮舉所有可能 並計算共幾個
+    每組皆為從小排到大
+    輸入: 
+        bn(x)=不能出現的牌(刻子輸入0)
+        x(x)end=窮舉的最後一組
+        x(x)_x(x+1)=兩組之間的差距
+        x(x)ch=每次窮舉變多少
+        count=計算次數 可設為 0 or count
+        showtile=是否展示牌 可設為TF
+    輸出: int count
+    '''
+    x1 = 1
+    while x1 <= x1end:
+        x1 = check(x1, bn1)
+        x2 = x1 + x1_x2
+        while x2 <= x2end:
+            x2 = check(x2, bn2)
+            x3 = x2 + x2_x3
+            while x3 <= x3end:
+                x3 = check(x3, bn3)
+                x4 = x3 + x3_x4
+                while x4 <= x4end:
+                    x4 = check(x4, bn4)
+                    x5 = x4 + x4_x5
+                    while x5 <= x5end:
+                        x5 = check(x5, bn5)
+                        count = get_pair(x1, x2, x3, x4, x5, bn1, bn2, bn3, bn4, bn5, count, showtile)
+                        x5 += x5ch
+                        if x5ch == 0: break
+                    x4 += x4ch
+                    if x4ch == 0: break
+                x3 += x3ch
+                if x3ch == 0: break
+            x2 += x2ch
+            if x2ch == 0: break
+        x1 += x1ch
+    return count
+count=0
+#print("test=", countallcomb(w8, w8, w8, w8, w8, s4, s7, p1, p4, p7, 3, 3, 3, 3, 1, 1, 1, 1, 1, count=0, showtile=1))
+
+'''
+bnx=[bn1, bn2, bn3, bn4, bn5]
+xxend=[x1end, x2end, x3end, x4end, x5end]
+xapart=[x1apart, x2apaet, x3apart, x4apart, x5apart]
+xxchange=[x1change, x2change, x3change, x4change, x5change]
+xx=[x1, x2, x3, x4, x5]
+'''
+
+def get_cant_be_pair(xx, bnx, count, showtile):
+    '''
+    那些牌不能當眼
+    
+    輸入: 刻子的位置
+    輸出: 更新後的 count
+    '''
+    cant_be_pair = []
+    for i in range(5): #111
+        if bnx[i] == 0:  cant_be_pair.append(xx[i])
+  
+    for i in range(3):
+        if (xx[i]+2) == (xx[i+1]+1) == xx[i+2]: cant_be_pair.append(xx[i+2]) #123, 234, 345
+        if xx[i] == xx[i+1] == xx[i+2]: #123, 123, 123
+            cant_be_pair.append(xx[i])
+            cant_be_pair.append(xx[i]+1)
+            cant_be_pair.append(xx[i]+2)
+        if xx[i]+1 == xx[i+1]+1 == xx[i+2] or xx[i]+1 == xx[i+1] == xx[i+2]: #123, 123, 234 OR 123, 234, 234
+            cant_be_pair.append(xx[i]+1)
+            cant_be_pair.append(xx[i]+2)
+        if xx[i]+2 == xx[i+1]+2 == xx[i+2] or xx[i]+2 == xx[i+1] == xx[i+2]: #123, 123, 345 OR 123, 345, 345
+            cant_be_pair.append(xx[i+2])
+        
+    cant_be_pair = list(set(cant_be_pair))
+    cant_be_pair.sort()
+    if cant_be_pair == []: cant_be_pair.append(0)
+
+    pair = 1
+    while pair <= 34:
+        if pair not in cant_be_pair:
+            if showtile:
+                for i in range(5):
+                    print(mlist[xx[i]], end=' ')
+                print(mlist[pair] + mlist[pair])
+            count += 1
+        pair += 1
+
+    return count
+
+def loop(i, xx, bnx, xxend, xapart, xxchange, count, showtile):
+    while xx[i] <= xxend[i]:
+        xx[i] = check(xx[i], bnx[i])
+        if i == 4: count = get_cant_be_pair(xx, bnx, count, showtile)
+        else:
+            xx[i + 1] = xx[i] + xapart[i]
+            count = loop(i + 1, xx, bnx, xxend, xapart, xxchange, count, showtile)
+        xx[i] += xxchange[i]
+        if xxchange[i] == 0: break
+    return count
+
+bnx=[w8, w8, w8, w8, w8]
+xxend=[s4, s7, p1, p4, p7]
+xapart=[3, 3, 3, 3]
+xxchange=[1, 1, 1, 1, 1]
+xx=[1, 0, 0, 0, 0]
+count=0
+
+#count = loop(0, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
+#print(count)
+'''
+print("全部不重複")
+count += countallcomb(w8, w8, w8, w8, w8, s4, s7, p1, p4, p7, 3, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+print(count)
+
+count = 0
+print("1張重疊*眼")
+print("一二組重疊")
+count += countallcomb(w6, w8, w8, w8, w8, s5, s7, p1, p4, p7, 2, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False)
+print("二三組重疊")
+count += countallcomb(w8, w6, w8, w8, w8, s2, s5, s7, p4, p7, 3, 2, 3, 3, 1, 1, 0, 1, 1, count, showtile=False)
+print("三四組重疊")
+count += countallcomb(w8, w8, w6, w8, w8, s4, s7, p2, p4, p7, 3, 3, 2, 3, 1, 1, 1, 0, 1, count, showtile=False)
+print("四五組重疊")
+count += countallcomb(w8, w8, w8, w6, w8, s4, s7, p2, p5, p7, 3, 3, 3, 2, 1, 1, 1, 1, 0, count, showtile=False)
+print(count)
+
+count = 0
+print("2張重疊*眼")
+#一二三組各疊一張
+count += countallcomb(w4, w6, w8, w8, w8, s3, s5, s7, p4, p7, 2, 2, 3, 3, 1, 0, 0, 1, 1, count, showtile=False)
+#二三四組各疊一張
+count += countallcomb(w8, w4, w6, w8, w8, w7, s3, s5, s7, p7, 3, 2, 2, 3, 1, 1, 0, 0, 1, count, showtile=False)
+#三四五組各疊一張
+count += countallcomb(w8, w8, w4, w6, w8, s4, s7, p3, p5, p7, 3, 3, 2, 2, 1, 1, 1, 0, 0, count, showtile=False)
+#一二組疊兩張
+count += countallcomb(w7, w8, w8, w8, w8, s6, s7, p1, p4, p7, 1, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False)
+#二三組疊兩張
+count += countallcomb(w8, w7, w8, w8, w8, s3, s6, s7, p4, p7, 3, 1, 3, 3, 1, 1, 0, 1, 1, count, showtile=False)
+#三四組疊兩張
+count += countallcomb(w8, w8, w7, w8, w8, s4, s7, p3, p4, p7, 3, 3, 1, 3, 1, 1, 1, 0, 1, count, showtile=False)
+#四五組重疊兩張
+count += countallcomb(w8, w8, w8, w7, w8, s4, s7, p3, p6, p7, 3, 3, 3, 1, 1, 1, 1, 1, 0, count, showtile=False)
+print(count)
+
+count=0
+print("3張重疊*眼")
+#一組是刻
+count += countallcomb(0, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+#二組是刻
+count += countallcomb(w8, 0, w8, w8, w8, s7, p1, p1, p4, p7, 0, 3, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+#三組是刻
+count += countallcomb(w8, w8, 0, w8, w8, s7, p1, p4, p4, p7, 3, 0, 3, 3, 1, 1, 1, 1, 1, count, showtile=False)
+#四組是刻
+count += countallcomb(w8, w8, w8, 0, w8, s7, p1, p4, p7, p7, 3, 3, 0, 3, 1, 1, 1, 1, 1, count, showtile=False)
+#五組是刻
+count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 0, 1, 1, 1, 1, 1, count, showtile=False)
+#一二組重疊三張
+print(countallcomb(w8, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False))
+'''
+
