@@ -10,11 +10,12 @@
 0409
 目前版本:優化get_pair(), countallcomb(), 以get_cant_be_pair(), loop()取代 
 get_cant_be_pair(), loop()已可包含所有胡牌可能 帶入參數改為使用list
-
+4010
+嘗試將參數自動化輸入，目前發現可能規律，用xapart跟xxchange窮舉即可，bnx跟xxend可以用xapart去反推
+新增all_xapart_xxchange()函式
 todo: 
     1.把全部胡牌可能的參數一個一個帶入 or 寫一個函式盡量可涵蓋全部胡牌可能 直接帶入loop即可
-    2.製作版本管理
-    3.製作胡牌種期望值
+    2.製作胡牌種期望值
 """
 w1=1
 w2=2
@@ -179,4 +180,32 @@ count += countallcomb(w8, w8, w8, w8, 0, s7, p1, p4, p7, 白, 3, 3, 3, 0, 1, 1, 
 #一二組重疊三張
 print(countallcomb(w8, w8, w8, w8, w8, s7, s7, p1, p4, p7, 0, 3, 3, 3, 1, 0, 1, 1, 1, count, showtile=False))
 '''
-
+def all_xapart_xxchange():
+    xapart=[0, 0, 0, 0]
+    all_xapart=[]
+    for x1apart in range(4):
+        xapart[0] = x1apart
+        for x2apart in range(4):
+            xapart[1] = x2apart
+            for x3apart in range(4):
+                xapart[2] = x3apart
+                for x4apart in range(4):
+                    xapart[3] = x4apart
+                    all_xapart.append(xapart)
+    xxchange = [0, 0, 0, 0, 0]
+    all_xxchange=[]
+    count=0
+    for x1change in range(2):
+        xxchange[0] = x1change
+        for x2change in range(2):
+            xxchange[1] = x2change
+            for x3change in range(2):
+                xxchange[2] = x3change
+                for x4change in range(2):
+                    xxchange[3] = x4change
+                    for x5change in range(2):
+                        xxchange[4] = x5change
+                        all_xxchange.append(xxchange)
+                        count+=1
+    print(len(all_xapart), len(all_xxchange))
+all_xapart_xxchange()
