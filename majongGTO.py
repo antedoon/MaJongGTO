@@ -1,13 +1,5 @@
 """
 全部胡牌可能
-=全不重疊*眼 + 一張重疊*眼 + 兩張重疊*眼 + 三張重疊*眼 +...+十五張重疊
-=
-
-一張重疊
-=一二組重疊 + 二三組重疊 +...+ 四五組重疊
-=
-
-全部胡牌可能
 =全順 + 1刻4順 +...+ 全刻
 =全順 + 第1組刻 2345順 + 第1組順 2刻 345順 +...+ 全刻
 =
@@ -21,10 +13,13 @@ get_cant_be_pair(), loop()已可包含所有胡牌可能 帶入參數改為使�
 
 嘗試後發現規律不對且複雜 改試 全順 + 1刻4順 +...+ 全刻
 新增函式illegal_comb()，將不合法組合都去除
+
+0411
+新增全順() 1刻4順()...5刻() 函式 全部胡牌可能已算完 開始做胡牌種期望值
+全部胡牌可能數: 1 2393 1970 0106 3678
     
 todo: 
-    1.把全部胡牌可能的參數一個一個帶入 or 寫一個函式盡量可涵蓋全部胡牌可能 直接帶入loop即可
-    2.製作胡牌種期望值
+    1.製作胡牌種期望值
 """
 import time
 w1=1
@@ -163,20 +158,14 @@ def loop(i, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
     return count
 
 #全順 1762320
-who_is_trip=[]
-bnx=[w8, w8, w8, w8, w8]
-xxend=[p4, p7, p7, p7, p7]
-xapart=[0, 0, 0, 0]
-xxchange=[1, 1, 1, 1, 1]
-xx=[1, 0, 0, 0, 0]
-count=0
-#count = loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, 0, showtile=1)
-print(count)
+def none_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
+    
+    count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+    return count
 def one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile): #58922754
     who_is_trip=[0]
     for i in range(5):
         bnx=[w8, w8, w8, w8, w8]
-        xxend=[p4, p7, p7, p7, p7]
         xapart=[0, 0, 0, 0]
         xxchange=[1, 1, 1, 1, 1]
         xx=[1, 0, 0, 0, 0]
@@ -188,21 +177,21 @@ def one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile): #5
         count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
         print("i=", i)
         time.sleep(1)
-    print(count)
+    return count
 
 def two_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
     who_is_trip=[0, 0]
     for i in range(5):
         for j in range(i+1, 5):
             bnx=[w8, w8, w8, w8, w8]
-            xxend=[p4, p7, p7, p7, p7]
+            xxend=[p7, p7, p7, p7, p7]
             xapart=[0, 0, 0, 0]
             xxchange=[1, 1, 1, 1, 1]
             xx=[1, 0, 0, 0, 0]
             
             who_is_trip[0]=[i+1]
             bnx[i]=0
-            if i == 4: xxend[i] = 白
+            if i >= 3: xxend[i] = 白
             if i >= 1: xapart[i-1]=1
             
             who_is_trip[1]=[j+1]
@@ -214,7 +203,7 @@ def two_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
             print("i=", i)
             print("j=", j)
             time.sleep(1)
-    print(count)
+    return count
 
 def three_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
     who_is_trip=[0, 0, 0]
@@ -222,19 +211,19 @@ def three_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
         for b in range(a+1, 5):
             for c in range(b+1, 5):
                 bnx=[w8, w8, w8, w8, w8]
-                xxend=[p4, p7, p7, p7, p7]
+                xxend=[p7, p7, p7, p7, p7]
                 xapart=[0, 0, 0, 0]
                 xxchange=[1, 1, 1, 1, 1]
                 xx=[1, 0, 0, 0, 0]
                 
                 who_is_trip[0]=[a+1]
                 bnx[a]=0
-                if a == 4: xxend[a] = 白
+                if a >= 2: xxend[a] = 白
                 if a >= 1: xapart[a-1]=1
                 
                 who_is_trip[1]=[b+1]
                 bnx[b]=0
-                if b == 4: xxend[b] = 白
+                if b >= 3: xxend[b] = 白
                 if b >= 1: xapart[b-1]=1
                 
                 who_is_trip[2]=[c+1]
@@ -244,7 +233,7 @@ def three_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
                 
                 count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
 
-    print(count)
+    return count
     
 def four_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
     who_is_trip=[0, 0, 0, 0]
@@ -254,24 +243,24 @@ def four_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
                 for d in range(c+1, 5):
                     
                     bnx=[w8, w8, w8, w8, w8]
-                    xxend=[p4, p7, p7, p7, p7]
+                    xxend=[p7, p7, p7, p7, p7]
                     xapart=[0, 0, 0, 0]
                     xxchange=[1, 1, 1, 1, 1]
                     xx=[1, 0, 0, 0, 0]
                     
                     who_is_trip[0]=[a+1]
                     bnx[a]=0
-                    if a == 4: xxend[a] = 白
+                    if a >= 1: xxend[a] = 白
                     if a >= 1: xapart[a-1]=1
                     
                     who_is_trip[1]=[b+1]
                     bnx[b]=0
-                    if b == 4: xxend[b] = 白
+                    if b >= 2: xxend[b] = 白
                     if b >= 1: xapart[b-1]=1
                     
                     who_is_trip[2]=[c+1]
                     bnx[c]=0
-                    if c == 4: xxend[c] = 白
+                    if c >= 3: xxend[c] = 白
                     if c >= 1: xapart[c-1]=1
                     
                     who_is_trip[3]=[d+1]
@@ -283,47 +272,33 @@ def four_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
                     
                     count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
 
-    print(count)
+    return count
     
 def five_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile):
-    who_is_trip=[0, 0, 0, 0]
-    for a in range(5):
-        for b in range(a+1, 5):
-            for c in range(b+1, 5):
-                for d in range(c+1, 5):
-                    
-                    bnx=[w8, w8, w8, w8, w8]
-                    xxend=[p4, p7, p7, p7, p7]
-                    xapart=[0, 0, 0, 0]
-                    xxchange=[1, 1, 1, 1, 1]
-                    xx=[1, 0, 0, 0, 0]
-                    
-                    who_is_trip[0]=[a+1]
-                    bnx[a]=0
-                    if a == 4: xxend[a] = 白
-                    if a >= 1: xapart[a-1]=1
-                    
-                    who_is_trip[1]=[b+1]
-                    bnx[b]=0
-                    if b == 4: xxend[b] = 白
-                    if b >= 1: xapart[b-1]=1
-                    
-                    who_is_trip[2]=[c+1]
-                    bnx[c]=0
-                    if c == 4: xxend[c] = 白
-                    if c >= 1: xapart[c-1]=1
-                    
-                    who_is_trip[3]=[d+1]
-                    bnx[d]=0
-                    if d == 4: xxend[d] = 白
-                    if d >= 1: xapart[d-1]=1
-                    
-                    
-                    
-                    count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+    who_is_trip=[1, 2, 3, 4, 5]
+    
+    bnx=[0, 0, 0, 0, 0]
+    xxend=[白, 白, 白, 白, 白]
+    xapart=[1, 1, 1, 1]
+    xxchange=[1, 1, 1, 1, 1]
+    xx=[1, 0, 0, 0, 0]
+    
+    count += loop(0, who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
 
-    print(count)
-#one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
-#two_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
-three_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+    return count
 
+who_is_trip=[]
+bnx=[w8, w8, w8, w8, w8]
+xxend=[p4, p7, p7, p7, p7]
+xapart=[0, 0, 0, 0]
+xxchange=[1, 1, 1, 1, 1]
+xx=[1, 0, 0, 0, 0]
+
+count=0
+count += none_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+count += one_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+count += two_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+count += three_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+count += four_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+count += five_trip(who_is_trip, xx, bnx, xxend, xapart, xxchange, count, showtile=1)
+print(count)
