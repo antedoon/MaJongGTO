@@ -88,7 +88,7 @@ def win(hand):
     輸入:手牌
     輸出:有無胡牌bool
     '''
-    return True
+    return False
 
 def game():
     #洗牌
@@ -102,13 +102,22 @@ def game():
         for j in range(16): player_hand[i][j] = stack.pop()
         hand_sort(player_hand[i])
     #hand = ['6w', '7w', '7w', '8w', '8w', '9w', '4w', '1w', '1w', '1w', '2w', '2w', '3w', '3w', '3w', '4w', '4w']
-    p=2
+    dispool=[]
+    p=0
     while True:
-        player_hand[p][16] = stack.pop()
+        player_hand[p].append(stack.pop())
         if win(player_hand[p]): 
             print(f"恭喜{mlist[p+27]}風玩家獲勝")
             break
+        #棄牌
+        print(player_hand[p])
+        distile = int(input("輸入要打掉的牌的索引值"))
+        dispool.append(player_hand[p][distile-1].pop())
+        print(dispool)
+        print(player_hand[p])
+        break
         p+=1
+        if p>=4: p=0
 game()
 
 
