@@ -90,6 +90,21 @@ def win(hand):
     '''
     return False
 
+def deal():
+    '''
+    摸牌
+    輸入:無
+    輸出:摸到哪張
+    '''
+    return stack.pop()
+
+def check_pon(hand, distile):
+    for i in range(len(hand)): hand[i] = int(hand[i]/4)
+    distile = int(distile/4)
+    hand_set = list(set(hand))
+    for i in hand_set:
+        if hand.count(i) >= 2 and i == distile: return True
+    return False
 def game():
     #洗牌
     import random
@@ -98,26 +113,32 @@ def game():
     #四家抓牌
     player_hand = [i for i in range(4)]
     for i in range(4): 
-        player_hand[i] = [j for j in range(17)]
-        for j in range(16): player_hand[i][j] = stack.pop()
+        player_hand[i] = []
+        for j in range(16): player_hand[i].append(stack.pop())
         hand_sort(player_hand[i])
-    #hand = ['6w', '7w', '7w', '8w', '8w', '9w', '4w', '1w', '1w', '1w', '2w', '2w', '3w', '3w', '3w', '4w', '4w']
     dispool=[]
     p=0
     while True:
-        player_hand[p].append(stack.pop())
+        player_hand[p].append(deal())
         if win(player_hand[p]): 
             print(f"恭喜{mlist[p+27]}風玩家獲勝")
             break
         #棄牌
         print(player_hand[p])
-        distile = int(input("輸入要打掉的牌的索引值"))
-        dispool.append(player_hand[p][distile-1].pop())
-        print(dispool)
-        print(player_hand[p])
-        break
+        distile_index = int(input(f"輪到{p+27}風玩家，輸入要打掉的牌的索引值:"))
+        distile = player_hand[p][distile_index-1]
+        dispool.append(player_hand[p].pop(distile_index-1))
+        #三家有無碰
+        for i in range(4):
+            if i != p and check_pon(player_hand[i], distile): 
+                need_pon = int(input(f"請問{i+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰"))
+                if need_pon == 1:
+                    p=i
+                    print(f"{i+27}風玩家 碰，輪到{i+27}風玩家")
+                    player_hand[p]
+
         p+=1
         if p>=4: p=0
-game()
+#game()
 
 
