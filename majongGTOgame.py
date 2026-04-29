@@ -90,21 +90,29 @@ def win(hand):
     '''
     return False
 
-def deal():
+def check_can_pon(hand, p, distile):
     '''
-    摸牌
-    輸入:無
-    輸出:摸到哪張
+    確認可不可以碰
+    輸入:手牌list, 第幾家打的, 棄牌
+    輸出:哪一家能碰 沒有就輸出5
     '''
-    return stack.pop()
+    for i in range(4):
+        if i != p:
+            for j in range(len(hand[i])): hand[i][j] = int(hand[i][j]/4)
+            distile = int(distile/4)
+            hand_set = list(set(hand[i]))
+            for j in hand_set:
+                if hand[i].count(j) >= 2 and j == distile: return True
+    return False
 
-def check_pon(hand, distile):
+def check_can_kan(hand, distile):
     for i in range(len(hand)): hand[i] = int(hand[i]/4)
     distile = int(distile/4)
     hand_set = list(set(hand))
     for i in hand_set:
-        if hand.count(i) >= 2 and i == distile: return True
+        if hand.count(i) >= 3 and i == distile: return True
     return False
+
 def game():
     #洗牌
     import random
@@ -119,26 +127,63 @@ def game():
     dispool=[]
     p=0
     while True:
-        player_hand[p].append(deal())
-        if win(player_hand[p]): 
+        #摸牌
+        player_hand[p].append(stack.pop())
+        #有無自摸
+        if win(player_hand[p]): #自摸
             print(f"恭喜{mlist[p+27]}風玩家獲勝")
-            break
-        #棄牌
-        print(player_hand[p])
-        distile_index = int(input(f"輪到{p+27}風玩家，輸入要打掉的牌的索引值:"))
-        distile = player_hand[p][distile_index-1]
-        dispool.append(player_hand[p].pop(distile_index-1))
-        #三家有無碰
-        for i in range(4):
-            if i != p and check_pon(player_hand[i], distile): 
-                need_pon = int(input(f"請問{i+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰"))
-                if need_pon == 1:
+            return player_hand(p)
+        
+        while True:
+            #棄牌
+            print(player_hand[p])
+            distile_index = int(input(f"輪到{p+27}風玩家，輸入要打掉的牌的索引值:"))
+            distile = player_hand[p][distile_index-1]
+            dispool.append(player_hand[p].pop(distile_index-1))
+            
+            #三家有無胡
+            for i in range(4):
+                if i != p and win(player_hand[i]): #放槍
+                    print(f"恭喜{mlist[i+27]}風玩家獲勝")
+                    player_hand[i].append(distile)
+                    return player_hand(i)
+            
+            who_can_pon = check_can_pon(player_hand, p, distile) #確認其他家可不可以碰
+            if who_can_pon != 5:
+                need_pon = int(input(f"請問{who_can_pon+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰")) #要不要碰
+                if need_pon == 1: #碰
+                    p=who_can_pon
+                    print(f"{who_can_pon+27}風玩家 碰，輪到{who_can_pon+27}風玩家")
+                    player_hand[p].append(distile)
+                    hand_sort(player_hand[p])
+                    continue
+                elif need_pon == 0:  #不碰
+                    if check_can_kan(player_hand, p, distile):  #確認可不可以槓
+                        need_kan = int(input(f"請問{i+27}風玩家需要槓嗎，輸入 1 槓，輸入 0 不槓")) #要不要槓
+                        if need_kan == 1: #要槓
+                            print(f"{i+27}風玩家 槓，輪到{i+27}風玩家")
+                            p=i
+                            #摸牌
+                            player_hand[p].append(stack.pop())
+                            continue
+                        elif need_kan == 0: break #不槓
+                        else: print("數字錯誤 放棄機會")
+                else: print("數字錯誤 放棄機會")
+            p+=1
+            if p>=4: p=0
+            if check_can_chi(player_hand[p], distile): #確認下家可不可以吃
+                need_chi = int(input(f"請問{i+27}風玩家需要吃嗎，輸入 1 吃，輸入 0 不吃"))
+                if need_chi == 1: #要不要吃
                     p=i
-                    print(f"{i+27}風玩家 碰，輪到{i+27}風玩家")
-                    player_hand[p]
-
-        p+=1
-        if p>=4: p=0
+                    print(f"{i+27}風玩家 吃，輪到{i+27}風玩家")
+                    player_hand[p].append(distile)
+                    hand_sort(player_hand[p])
+                    continue
+                elif need_chi == 0: break
+            break
+        if stack_is_empty():
+            print("牌山為空 流局")
+            return 0
 #game()
 
 
