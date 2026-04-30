@@ -113,6 +113,14 @@ def check_can_kan(hand, distile):
         if hand.count(i) >= 3 and i == distile: return True
     return False
 
+def check_can_chi(hand, p, distile):
+    '''
+    確認可不可以吃
+    輸入:手牌List, 誰打的, 棄牌
+    輸出:BOOL
+    '''
+    for i in range(len(hand[(p+1)%4])): hand[(p+1)%4][i] = int(hand[(p+1)%4][i]/4)
+    
 def game():
     #洗牌
     import random
@@ -148,38 +156,34 @@ def game():
                     player_hand[i].append(distile)
                     return player_hand(i)
             
-            who_can_pon = check_can_pon(player_hand, p, distile) #確認其他家可不可以碰
-            if who_can_pon != 5:
-                need_pon = int(input(f"請問{who_can_pon+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰")) #要不要碰
+            if check_can_pon(player_hand, p, distile) != 5: #確認其他家可不可以碰
+                need_pon = int(input(f"請問{check_can_pon(player_hand, p, distile)+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰")) #要不要碰
                 if need_pon == 1: #碰
-                    p=who_can_pon
-                    print(f"{who_can_pon+27}風玩家 碰，輪到{who_can_pon+27}風玩家")
+                    p=check_can_pon(player_hand, p, distile)
+                    print(f"{p+27}風玩家 碰，輪到{p+27}風玩家")
                     player_hand[p].append(distile)
                     hand_sort(player_hand[p])
                     continue
                 elif need_pon == 0:  #不碰
                     if check_can_kan(player_hand, p, distile):  #確認可不可以槓
-                        need_kan = int(input(f"請問{i+27}風玩家需要槓嗎，輸入 1 槓，輸入 0 不槓")) #要不要槓
+                        need_kan = int(input(f"請問{check_can_kan(player_hand, p, distile)+27}風玩家需要槓嗎，輸入 1 槓，輸入 0 不槓")) #要不要槓
                         if need_kan == 1: #要槓
-                            print(f"{i+27}風玩家 槓，輪到{i+27}風玩家")
-                            p=i
+                            p=check_can_kan(player_hand[check_can_pon(player_hand, p, distile)], distile)
+                            print(f"{p+27}風玩家 槓，輪到{p+27}風玩家")
                             #摸牌
                             player_hand[p].append(stack.pop())
                             continue
-                        elif need_kan == 0: break #不槓
+                        elif need_kan == 0: continue #不槓
                         else: print("數字錯誤 放棄機會")
                 else: print("數字錯誤 放棄機會")
-            p+=1
-            if p>=4: p=0
-            if check_can_chi(player_hand[p], distile): #確認下家可不可以吃
-                need_chi = int(input(f"請問{i+27}風玩家需要吃嗎，輸入 1 吃，輸入 0 不吃"))
-                if need_chi == 1: #要不要吃
-                    p=i
-                    print(f"{i+27}風玩家 吃，輪到{i+27}風玩家")
+            if check_can_chi(player_hand, p, distile): #確認下家可不可以吃
+                need_chi = int(input(f"請問{p+27}風玩家需要吃嗎，輸入 1 吃，輸入 0 不吃")) #要不要吃
+                if need_chi == 1: #要吃
+                    print(f"{p+27}風玩家 吃，輪到{p+27}風玩家")
                     player_hand[p].append(distile)
                     hand_sort(player_hand[p])
                     continue
-                elif need_chi == 0: break
+                elif need_chi == 0: break #不吃
             break
         if stack_is_empty():
             print("牌山為空 流局")
