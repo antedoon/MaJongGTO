@@ -5,40 +5,6 @@ p = (1p, 2p, 3p, 4p, 5p, 6p, 7p, 8p, 9p) #餅
 z = (1z, 2z, 3z, 4z, 5z, 6z, 7z) #東南西北白發中
 h = (1h, 2h, 3h, 4h, 5h, 6h, 7h, 8h) #春夏秋冬梅蘭竹菊
 '''
-w1=1
-w2=2
-w3=3
-w4=4
-w5=5
-w6=6
-w7=7
-w8=8
-w9=9
-s1=10
-s2=11
-s3=12
-s4=13
-s5=14
-s6=15
-s7=16
-s8=17
-s9=18
-p1=19
-p2=20
-p3=21
-p4=22
-p5=23
-p6=24
-p7=25
-p8=26
-p9=27
-東=28
-南=29
-西=30
-北=31
-中=32
-發=33
-白=34
 mlist = ['1w', '2w', '3w', '4w', '5w', '6w', '7w', '8w', '9w', '1s', 
         '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '1p', '2p', 
         '3p', '4p', '5p', '6p', '7p', '8p', '9p', '東', '南', '西', 
@@ -120,6 +86,11 @@ def check_can_chi(hand, p, distile):
     輸出:BOOL
     '''
     for i in range(len(hand[(p+1)%4])): hand[(p+1)%4][i] = int(hand[(p+1)%4][i]/4)
+    distile = int(distile/4)
+    hand_set = list(set(hand[p+1]))
+    for j in hand_set:
+        if hand[p+1].count(j) >= 2 and j == distile: return True
+    return False
     
 def game():
     #洗牌
