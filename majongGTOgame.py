@@ -12,6 +12,12 @@ mlist = ['1w', '2w', '3w', '4w', '5w', '6w', '7w', '8w', '9w', '1s',
 
 MaJong = [i for i in range(136)]
 
+def show_tile(Hand):
+    hand = Hand.copy()
+    for i in range(len(hand)): 
+        hand[i] = int(hand[i]/4)
+        hand[i] = mlist[hand[i]]
+    print(hand)
     
 def hand_sort(hand):
     '''
@@ -87,11 +93,21 @@ def check_can_chi(hand, p, distile):
     '''
     for i in range(len(hand[(p+1)%4])): hand[(p+1)%4][i] = int(hand[(p+1)%4][i]/4)
     distile = int(distile/4)
-    hand_set = list(set(hand[p+1]))
-    for j in hand_set:
-        if hand[p+1].count(j) >= 2 and j == distile: return True
+    for i in range(len(hand[(p+1)%4])-1): 
+        if (distile+2 == hand[p+1][i]+1 == hand[p+1][i+1]) and distile%9 != 7 and distile%9 != 8:
+            return True
+        if ((hand[p+1][i]+2 == distile+1 == hand[p+1][i+1]) or (hand[p+1][i]+2 == hand[p+1][i+1]+1 == distile)) and hand[p+1][i]%9 != 7 and hand[p+1][i]%9 != 8:
+            return True
     return False
-    
+
+def stack_is_empty(stack):
+    '''
+    輸出: bool
+    '''
+    if stack == []:
+        return True
+    return False
+
 def game():
     #洗牌
     import random
@@ -103,6 +119,9 @@ def game():
         player_hand[i] = []
         for j in range(16): player_hand[i].append(stack.pop())
         hand_sort(player_hand[i])
+    for i in range(4): 
+        print(mlist[i+27])
+        show_tile(player_hand[i])
     dispool=[]
     p=0
     while True:
@@ -116,7 +135,7 @@ def game():
         while True:
             #棄牌
             print(player_hand[p])
-            distile_index = int(input(f"輪到{p+27}風玩家，輸入要打掉的牌的索引值:"))
+            distile_index = int(input(f"輪到{mlist[p+27]}風玩家，輸入要打掉的牌的索引值:"))
             distile = player_hand[p][distile_index-1]
             dispool.append(player_hand[p].pop(distile_index-1))
             
@@ -128,19 +147,19 @@ def game():
                     return player_hand(i)
             
             if check_can_pon(player_hand, p, distile) != 5: #確認其他家可不可以碰
-                need_pon = int(input(f"請問{check_can_pon(player_hand, p, distile)+27}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰")) #要不要碰
+                need_pon = int(input(f"請問{mlist[check_can_pon(player_hand, p, distile)+27]}風玩家需要碰嗎，輸入 1 碰，輸入 0 不碰")) #要不要碰
                 if need_pon == 1: #碰
                     p=check_can_pon(player_hand, p, distile)
-                    print(f"{p+27}風玩家 碰，輪到{p+27}風玩家")
+                    print(f"{mlist[p+27]}風玩家 碰，輪到{mlist[p+27]}風玩家")
                     player_hand[p].append(distile)
                     hand_sort(player_hand[p])
                     continue
                 elif need_pon == 0:  #不碰
                     if check_can_kan(player_hand, p, distile):  #確認可不可以槓
-                        need_kan = int(input(f"請問{check_can_kan(player_hand, p, distile)+27}風玩家需要槓嗎，輸入 1 槓，輸入 0 不槓")) #要不要槓
+                        need_kan = int(input(f"請問{mlist[check_can_kan(player_hand, p, distile)+27]}風玩家需要槓嗎，輸入 1 槓，輸入 0 不槓")) #要不要槓
                         if need_kan == 1: #要槓
                             p=check_can_kan(player_hand[check_can_pon(player_hand, p, distile)], distile)
-                            print(f"{p+27}風玩家 槓，輪到{p+27}風玩家")
+                            print(f"{mlist[p+27]}風玩家 槓，輪到{mlist[p+27]}風玩家")
                             #摸牌
                             player_hand[p].append(stack.pop())
                             continue
@@ -148,17 +167,17 @@ def game():
                         else: print("數字錯誤 放棄機會")
                 else: print("數字錯誤 放棄機會")
             if check_can_chi(player_hand, p, distile): #確認下家可不可以吃
-                need_chi = int(input(f"請問{p+27}風玩家需要吃嗎，輸入 1 吃，輸入 0 不吃")) #要不要吃
+                need_chi = int(input(f"請問{mlist[p+27]}風玩家需要吃嗎，輸入 1 吃，輸入 0 不吃")) #要不要吃
                 if need_chi == 1: #要吃
-                    print(f"{p+27}風玩家 吃，輪到{p+27}風玩家")
+                    print(f"{mlist[p+27]}風玩家 吃，輪到{mlist[p+27]}風玩家")
                     player_hand[p].append(distile)
                     hand_sort(player_hand[p])
                     continue
                 elif need_chi == 0: break #不吃
             break
-        if stack_is_empty():
+        if stack_is_empty(stack):
             print("牌山為空 流局")
             return 0
-#game()
+game()
 
 
